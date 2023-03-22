@@ -1,0 +1,238 @@
+【安装步骤】
+1、先安装ubuntu 16.04环境
+   安装ubuntu16.04，可以全新系统安装或者虚拟机安装，可以参考后面教程
+  
+2、安装Ros Kinetic
+    可以参考下面一节”如何安装ros“
+
+3、安装开发软件包 vscode cmake git vim 
+   vscode需要下载c++支持的附属插件
+   使用git 建议使用ssh key方式进行校验，详细教程可以参考下面“如何使用免密钥ssh登录”
+
+4、下载源代码
+   硬件基础平台库
+   git clone git@gitlab.cotek-robotics.com:CppCore/smartgo-pro-base.git
+   
+   硬件界面库
+   git@gitlab.cotek-robotics.com:cpp/controller-interface.git
+    
+
+5、编译，首先需要下载依赖库，然后进行本地编译
+
+
+【全新安装】
+1、先制作iso镜像到U盘，可以参考网上教程
+2、电脑插上U盘后，F12启动选择U盘启动，开机后选择进入安装系统而不是试用系统
+3、按照操作步骤一步步进行下去就行了
+
+
+【虚拟机安装】
+1、先下载虚拟机VMware 或者 Oracle VM VirtualBox
+2、选择新装虚拟机，然后把iso镜像加载上去就可
+
+注意：
+  1、虚拟机如何开启全屏模式
+    虚拟机窗口界面上面点击 设备-》安装增强功能
+  2、如何开启windows和虚拟机之间的复制黏贴
+    虚拟机窗口界面上面点击 设备-》共享粘贴板-》双向
+  3、如何开启共享文件夹
+    虚拟机窗口界面上面点击 设备-》共享文件夹-》共享文件夹 选择固定分配文件夹
+  4、虚拟机有时候无法上网
+    设置-》启动网络连接 连接方式：桥接网卡 界面名称选择：当前使用的网卡 控制芯片：准虚拟化网络（virtio-net） 混杂模式:拒绝 接入网线
+
+
+【如何开启ssh服务】
+
+查看是否开启了ssh服务是否安装,使用命令：
+sudo ps -e |grep ssh
+如果安装了的是会看到sshd服务
+
+安装ssh服务
+SSH分客户端openssh-client和服务端openssh-server
+sudo apt-get install openssh-server
+sudo apt-get install openssh-client
+
+服务启动与关闭
+sudo /etc/init.d/ssh start
+或者
+service sshd start
+service sshd stop
+
+ssh-server配置文件位于/ etc/ssh/sshd_config，在这里可以定义SSH的服务端口，默认端口是22，你可以自己定义成其他端口号，如222。
+然后重启SSH服务：
+sudo /etc/init.d/ssh stop
+sudo /etc/init.d/ssh start
+
+然后使用以下方式登陆SSH：
+ssh username@192.168.1.112 username为192.168.1.112 机器上的用户，需要输入密码
+断开连接：exit 
+
+【如何使用免密钥ssh登录】
+
+先在windows下执行如下命令
+ssh-keygen -t rsa -b 4096
+
+Generating public/private rsa key pair.
+Enter file in which to save the key (C:\Users\86186/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in C:\Users\86186/.ssh/id_rsa.
+Your public key has been saved in C:\Users\86186/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:JN2M5c6uFvtje2fobiw941/XwvGIypOA1kFGK6JtOIM 86186@LAPTOP-AAUP85TC
+The key's randomart image is:
++---[RSA 4096]----+
+|       .. .      |
+|       .oB       |
+|    . oo= +      |
+| . + . +.o       |
+|E = o  oS.o   .  |
+|   +  o +.   o +.|
+|     .   +.+..+ =|
+|        oo*.O oo.|
+|       ..o=@+*.  |
++----[SHA256]-----+
+
+看清楚产生目录位置为C:\Users\86186/.ssh/id_rsa.pub
+
+使用scp命令将此文件copy到目标主机上
+
+scp id_rsa.pub lcl@192.168.1.204
+
+mkdir .ssh
+
+mv id_rsa.pub .ssh
+cat id_rsa.pub >> authorized_keys
+sudo chmod 660 authorized_keys
+
+service sshd restart
+
+也可以参考https://code.visualstudio.com/docs/remote/troubleshooting#_configuring-key-based-authentication
+
+
+【如何安装ros】
+
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 76F1A20FF987672F
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv F42ED6FBAB17C654
+或者
+sudo apt install curl # if you haven't already installed curl
+curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+
+sudo apt-get update
+sudo apt-get install ros-kinetic-desktop-full --force-yes -y
+
+echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+
+sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+
+sudo apt install python-rosdep
+
+sudo rosdep init
+rosdep update
+
+// 其他需要安装的库
+#sudo apt-get install ros-kinetic-robot-upstart  --force-yes -y
+#sudo apt-get install ros-kinetic-laser-proc  --force-yes -y
+#sudo apt-get install ros-kinetic-urg-c  --force-yes -y
+#sudo apt-get install python3-pip  --force-yes -y
+
+#pip3 install remi
+#pip3 install pyyaml
+
+sudo rosdep fix-permissions
+source ~/.bashrc
+
+
+如何有其他ros库，可以执行如何类似命令
+#echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+
+
+【如何进行跨平台开发】
+
+可以参考另一篇文档
+
+【如何生成git 密钥鉴权】
+ssh-keygen -t rsa -b 4096 -C "lichl@cotek-robotics.com"
+
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/lcl/.ssh/id_rsa):
+Created directory '/home/lcl/.ssh'.
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/lcl/.ssh/id_rsa.
+Your public key has been saved in /home/lcl/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:ChDgBzAZWQo4n44Wesf9pWBNQ5aDnxI5CjOE/Js1LIU lichl@cotek-robotics.com
+The key's randomart image is:
++---[RSA 4096]----+
+|XX+ .  o .       |
+|O+=E .= =        |
+|.+o*o. * o       |
+| .++.+. =        |
+|.o..*..+S.       |
+|o.ooo.+.. .      |
+|.. . ..o o       |
+|        o        |
+|                 |
++----[SHA256]-----+
+
+cat /home/lcl/.ssh/id_rsa.pub
+
+将密钥复制到网页里面
+
+【git submodule 命令使用】
+---添加
+为当前工程添加submodule，命令如下：
+
+git submodule add 仓库地址 路径
+
+其中，仓库地址是指子模块仓库地址，路径指将子模块放置在当前工程下的路径。 
+注意：路径不能以 / 结尾（会造成修改不生效）、不能是现有工程已有的目录（不能順利 Clone）
+命令执行完成，会在当前工程根路径下生成一个名为“.gitmodules”的文件，其中记录了子模块的信息。添加完成以后，再将子模块所在的文件夹添加到工程中即可。
+
+---删除
+submodule的删除稍微麻烦点：首先，要在“.gitmodules”文件中删除相应配置信息。然后，执行“git rm –cached ”命令将子模块所在的文件从git中删除。
+
+---下载带有submodule的工程
+当使用git clone下来的工程中带有submodule时，初始的时候，submodule的内容并不会自动下载下来的，此时，只需执行如下命令：
+
+// 初始化本地配置文件
+$ git submodule init
+// 检出父仓库列出的commit
+$ git submodule update
+或者
+git submodule update --init --recursive
+即可将子模块内容下载下来后工程才不会缺少相应的文件。
+
+【如何安装lfs】
+
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+
+sudo apt-get install git-lfs
+
+git lfs install
+
+
+【如何进行本地下载和编译】
+
+1、先创建目录prj
+   mkdir ~/prj
+
+2、先下载源码 建议使用 SSH key密钥鉴权方式同步代码（http需要经常设置用户名/密码）
+
+  cd ~/prj/
+  git clone git@gitlab.cotek-robotics.com:CppCore/smartgo-pro-base.git
+  下载完成后
+  mv smartgo-pro-base src
+  
+3、下载子模块
+   cd src
+   git submodule update --init --recursive
+   
+   
+
+
+   

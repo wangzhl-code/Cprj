@@ -1,0 +1,92 @@
+介绍：cmake是一个编程工具，可以自动生成makefile文件，可以编译文件、链接库、安装文件。
+现构建一个使用cmake的项目或工程。假设项目名为code
+
+1. mkdir code
+   cd code
+
+2. mkdir src include lib bin
+//注释：src用来存放源文件；include存放头文件；lib存放编译好的库文件；bin存放编译好的可执行二进制文件
+
+3. 同时在code下建立CMakelists.txt
+   touch CMakelists.txt
+
+4. vim CMakelists.txt
+   CMAKE_MINIMUM_REQUIRED( VERSION 2.8 ) #设定使用的cmake的版本
+   PROJECT( code ) #设定项目或工程名
+   SET( CMAKE_CXX_COMPILER "g++") #设定编译器
+   SET( EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)#设定编译后生成的
+可执行二进制文件所在的目录
+   SET( LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)#设定编译后生成的库文件所在的目录
+   LINK_DIRECTORIES( ${PROJECT_SOURCE_DIR}/lib)#并且把该目录设为链接目录
+   INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/include)#设定头文件所在的目录
+   ADD_SUBDIRECTORY( ${PROJECT_SOURCE_DIR}/src)#如果希望进入源代码文件夹仍
+可以继续使用cmake，则需增加文件夹
+
+5.接下来，实现怎么样使用CMake将一个源文件编译成一个可执行的二进制文件
+   首先，在src子目录下新建一个名字为main.cpp的源文件
+
+并在main.cpp中写入如下内容：（“写入”的操作如上）
+
+#include <iostream>
+
+int main(int argc, char**argv)
+{
+std::cout<<"Hello SLAM!"<<std::endl;
+return 0;
+}
+
+为了将这个源文件编译成一个可执行的二进制文件，我们还需在src子目录下新建一个cmake编译文件，名字为CMakeLists.txt
+
+touch CMakeLists.txt
+
+并写入如下内容：("写入"操作如上)
+
+ADD_EXECUTABLE( main main.cpp )# 增加一个可执行的二进制
+
+6. cd ..
+    当前目录在code/下
+
+7. mkdir build
+  cd build
+  cmake ..
+  make
+
+一、vscode相关配置(gdb调试)
+################################################
+1.ubuntu下vscode配置gdb调试：
+①sudo apt install gcc
+②sudo apt install g++
+③sudo apt install gdb
+
+配置完launch.json文件后，如果出现F5调试时跳到断点出，再按F11单步执行发现没作用(连续F11后报"找不到libc-start.c")，
+原因是没有安装glibc库，方法：
+sudo apt install glibc-source
+安装好后路径在 /usr/src/glibc
+sudo tar -xvf glibc-<>.tar.xz
+
+然后注意vscode报的是不是/build/glibc-CVJwZb/glibc-2.27/这个路径下找不到，
+则在/中 sudo mkdir build， 将下载好的glibc移到build中并更名glibc-CVJwZb
+
+2.编译工具
+sudo apt install cmake
+
+################################################
+
+
+二、代码管理工具(可视化图形界面)
+################################################
+1.gitkraken链接：version7.5.1
+windows下：
+修改C:\Windows\System32\drivers\etc下的hosts文件，添加127.0.0.1 release.gitkraken.com
+Ubuntu下：
+修改/etc/hosts
+
+历史版本下载（改改版本号就行）
+Linux-deb : https://release.axocdn.com/linux/GitKraken-v7.5.1.deb
+Linux-rpm : https://release.axocdn.com/linux/GitKraken-v7.5.1.rpm
+Linux-tar.gz : https://release.axocdn.com/linux/GitKraken-v7.5.1.tar.gz
+Win64 https://release.axocdn.com/win64/GitKrakenSetup-7.5.1.exe
+Mac : https://release.axocdn.com/darwin/GitKraken-v7.5.1.zip
+
+
+################################################
